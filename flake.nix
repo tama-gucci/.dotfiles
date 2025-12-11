@@ -6,6 +6,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     
     lanzaboote = {
       url = "github:nix-community/lanzaboote/v0.4.3";

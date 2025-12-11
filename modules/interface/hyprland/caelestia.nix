@@ -192,7 +192,15 @@ in
         
         cli = {
           enable = true;
-          settings.theme.enableGtk = false;
+          settings.theme = {
+            enableTerm = true;
+            enableHypr = true;
+            enableDiscord = true;
+            enableSpicetify = false;
+            enableFuzzel = true;
+            enableBtop = true;
+            enableGtk = true;
+            enableQt = true;
         };
       };
       
