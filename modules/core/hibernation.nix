@@ -52,12 +52,10 @@ in
     '';
     
     # Power button behavior
-    services.logind = {
-      lidSwitch = "suspend-then-hibernate";
-      extraConfig = ''
-        HandlePowerKey=hibernate
-        HandlePowerKeyLongPress=poweroff
-      '';
+    services.logind.settings.Login = {
+      HandleLidSwitch = "suspend-then-hibernate";
+      HandlePowerKey = "hibernate";
+      HandlePowerKeyLongPress = "poweroff";
     };
   };
 }

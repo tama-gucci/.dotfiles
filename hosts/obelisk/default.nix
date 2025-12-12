@@ -5,7 +5,10 @@
 
   modules = {
     # Use sin's profile (sets user, git, shell customizations)
-    profiles.sin.enable = true;
+    profiles.sin = {
+      enable = true;
+      type = "desktop";
+    };
     
     # Core
     network.hostName = "obelisk";
@@ -19,6 +22,12 @@
     audio.enable = true;
     bluetooth.enable = true;
     secureboot.enable = true;
+    
+    hibernation = {
+      enable = true;
+      resumeDevice = "5463af7b-e287-4f0c-8a3a-d87398592c2b";
+      swapfileOffset = 968969;
+    };
 
     monitors.displays = [
       {
@@ -28,7 +37,7 @@
         refreshRate = 240;
         scale = 1.5;
         hdr = true;
-        vrr = true;
+        vrr = 3;  # 0=off, 1=on, 2=fullscreen, 3=fullscreen+game
       }
     ];
 

@@ -8,6 +8,16 @@ in
 {
   options.modules.profiles.sin = {
     enable = mkEnableOption "Sin's user profile";
+    
+    type = mkOption {
+      type = types.enum [ "desktop" "server" ];
+      default = "desktop";
+      description = ''
+        Profile type:
+        - desktop: Full GUI environment with applications
+        - server: Minimal CLI-only configuration
+      '';
+    };
   };
 
   config = mkIf cfg.enable {
@@ -16,19 +26,23 @@ in
       name = "sin";
       shell = "fish";
       sudoNoPassword = true;
-      desktop = true;
+      desktop = cfg.type == "desktop";
       editor = "nvim";
-      packages = with pkgs; [
-        google-chrome
-        nautilus
-        mpv
-      ];
+      packages = with pkgs; 
+        # Base packages (always installed)
+        [ ]
+        # Desktop packages (only on desktop)
+        ++ optionals (cfg.type == "desktop") [
+          nautilus
+          mpv
+          signal-desktop
+        ];
     };
     
     # Git configuration for sin
     modules.git = {
       enable = true;
-      userName = "Sinclair";
+      userName = "sin";
       userEmail = "sinclair.rivera@gmail.com";  # Set your email here
       defaultBranch = "main";
       editor = "nvim";
@@ -99,8 +113,8 @@ in
         };
       };
       
-      # Kitty terminal customization (override defaults)
-      programs.kitty.settings = lib.mkForce {
+      # Kitty terminal customization (desktop only)
+      programs.kitty.settings = mkIf (cfg.type == "desktop") (lib.mkForce {
         font_family = "JetBrainsMono Nerd Font";
         font_size = 12;
         background_opacity = "0.92";
@@ -114,7 +128,7 @@ in
         # Window settings
         window_padding_width = 8;
         hide_window_decorations = false;
-      };
+      });
     };
   };
 }

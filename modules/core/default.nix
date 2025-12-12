@@ -4,6 +4,7 @@
   imports = [
     ./boot.nix
     ./git.nix
+    ./hibernation.nix
     ./home.nix
     ./locale.nix
     ./networking.nix

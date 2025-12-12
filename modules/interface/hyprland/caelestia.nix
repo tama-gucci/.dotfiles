@@ -201,6 +201,7 @@ in
             enableBtop = true;
             enableGtk = true;
             enableQt = true;
+          };
         };
       };
       

@@ -61,9 +61,16 @@ let
       };
       
       vrr = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Enable Variable Refresh Rate (FreeSync/G-Sync)";
+        type = types.ints.between 0 3;
+        default = 0;
+        description = ''
+          Variable Refresh Rate mode:
+          0 - off
+          1 - on
+          2 - fullscreen only
+          3 - fullscreen with game content type
+        '';
+        example = 1;
       };
       
       hdr = mkOption {
@@ -117,7 +124,7 @@ let
       let
         base = "${mon.name},${toString mon.width}x${toString mon.height}@${toString mon.refreshRate},${toString mon.x}x${toString mon.y},${toString mon.scale}";
         transformPart = optionalString (mon.transform != "normal") ",transform,${hyprlandTransform mon.transform}";
-        vrrPart = optionalString mon.vrr ",vrr,1";
+        vrrPart = optionalString (mon.vrr > 0) ",vrr,${toString mon.vrr}";
       in
         base + transformPart + vrrPart
     else
@@ -132,7 +139,7 @@ let
             scale ${toString mon.scale}
             position x=${toString mon.x} y=${toString mon.y}
             ${niriTransform mon.transform}
-            ${optionalString mon.vrr "variable-refresh-rate"}
+            ${optionalString (mon.vrr > 0) "variable-refresh-rate"}
         }
       ''
     else
