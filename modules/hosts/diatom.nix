@@ -1,7 +1,7 @@
 # ═══════════════════════════════════════════════════════════════════════════
 # HOST: DIATOM
 # ═══════════════════════════════════════════════════════════════════════════
-# Laptop - Intel CPU, NVIDIA GPU (Optimus)
+# Microsoft Surface Laptop Studio - Intel CPU, NVIDIA GPU (Optimus)
 { lib, config, inputs, pkgs, modulesPath, ... }:
 let
   modules = config.flake.modules.nixos;
@@ -16,7 +16,8 @@ in
     modules = [
       # Core modules (in order of inheritance)
       modules.laptop             # Includes base → pc → laptop (power management)
-      modules.nvidia             # NVIDIA drivers
+      modules.nvidia             # NVIDIA drivers (with Optimus support)
+      modules.surface            # Surface hardware (patched kernel, iptsd, etc.)
       modules.secureboot         # Lanzaboote
       
       # Interface
@@ -35,13 +36,27 @@ in
         networking.hostName = "diatom";
         
         # ─────────────────────────────────────────────────────────────────
+        # SURFACE LAPTOP STUDIO CONFIGURATION
+        # ─────────────────────────────────────────────────────────────────
+        surface = {
+          model = "laptop-studio";
+          kernelVersion = "stable";  # Newer kernel for better hardware support
+          touchscreen.enable = true;
+        };
+        
+        # ─────────────────────────────────────────────────────────────────
         # NVIDIA OPTIMUS (LAPTOP)
         # ─────────────────────────────────────────────────────────────────
-        nvidia.prime = {
-          enable = true;
-          mode = "offload";  # Best battery life; use "sync" for performance
-          intelBusId = "PCI:0:2:0";
-          nvidiaBusId = "PCI:1:0:0";
+        # Surface Laptop Studio has RTX 3050 Ti
+        # Bus IDs: run `lspci | grep VGA` to verify
+        nvidia = {
+          useCustomKernel = false;  # Use linux-surface kernel from Surface module
+          prime = {
+            enable = true;
+            mode = "offload";  # Best battery life; use "sync" for performance
+            intelBusId = "PCI:0:2:0";
+            nvidiaBusId = "PCI:1:0:0";
+          };
         };
         
         # ─────────────────────────────────────────────────────────────────
@@ -58,7 +73,14 @@ in
         # BOOT & KERNEL
         # ─────────────────────────────────────────────────────────────────
         boot.initrd.availableKernelModules = [ 
-          "xhci_pci" "thunderbolt" "nvme" "usb_storage" "sd_mod" 
+          "xhci_pci" 
+          "thunderbolt" 
+          "nvme" 
+          "usb_storage" 
+          "sd_mod"
+          # Surface-specific modules for early boot
+          "surface_aggregator"
+          "surface_aggregator_registry" 
         ];
         boot.kernelModules = [ "kvm-intel" ];
         
@@ -89,11 +111,11 @@ in
         nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
         
         # ─────────────────────────────────────────────────────────────────
-        # LAPTOP-SPECIFIC SERVICES
+        # LAPTOP STUDIO SPECIFIC SERVICES
         # ─────────────────────────────────────────────────────────────────
         services.openssh.enable = true;
         
-        # Backlight control
+        # Backlight control (screen + keyboard)
         programs.light.enable = true;
       })
     ];

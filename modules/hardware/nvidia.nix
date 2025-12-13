@@ -10,6 +10,15 @@
     # OPTIONS
     # ─────────────────────────────────────────────────────────────────────────
     options.nvidia = {
+      useCustomKernel = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = ''
+          Whether to use CachyOS kernel. Set to false when using
+          another specialized kernel (e.g., linux-surface).
+        '';
+      };
+      
       prime = {
         enable = lib.mkEnableOption "NVIDIA Optimus (hybrid graphics)";
         mode = lib.mkOption {
@@ -39,8 +48,9 @@
     # CONFIG
     # ─────────────────────────────────────────────────────────────────────────
     config = {
-      # CachyOS kernel for better performance
-      boot.kernelPackages = pkgs.linuxPackages_cachyos-lto;
+      # CachyOS kernel for better performance (unless using custom kernel)
+      boot.kernelPackages = lib.mkIf config.nvidia.useCustomKernel 
+        (lib.mkDefault pkgs.linuxPackages_cachyos-lto);
       
       # Preserve VRAM during suspend
       boot.kernelParams = [ "nvidia.NVreg_PreserveVideoMemoryAllocations=1" ];
@@ -54,7 +64,8 @@
         powerManagement.finegrained = config.nvidia.prime.enable && config.nvidia.prime.mode == "offload";
         open = false;
         nvidiaSettings = true;
-        package = pkgs.linuxPackages_cachyos-lto.nvidiaPackages.beta;
+        # Use beta drivers from whatever kernel is configured
+        package = config.boot.kernelPackages.nvidiaPackages.beta;
         
         # Prime configuration (for laptops)
         prime = lib.mkIf config.nvidia.prime.enable {
