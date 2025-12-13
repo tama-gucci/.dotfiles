@@ -6,6 +6,13 @@ let
   cfg = config.modules.niri;
   username = config.modules.user.name;
   monitorsCfg = config.modules.monitors;
+  
+  # Check if Noctalia is enabled for Niri
+  noctaliaCfg = config.modules.noctalia;
+  useNoctalia = noctaliaCfg.enable && noctaliaCfg.windowManager == "niri";
+  
+  # Helper function for Noctalia IPC commands in Niri format
+  noctaliaBind = cmd: ''"noctalia-shell" "ipc" "call" ${lib.concatMapStringsSep " " (s: ''"${s}"'') (lib.splitString " " cmd)}'';
 in
 {
   options.modules.niri = {
@@ -56,7 +63,21 @@ in
     };
     
     # Essential Wayland packages
+    # When using Noctalia, omit packages that Noctalia replaces (bar, notifications, etc.)
     environment.systemPackages = with pkgs; [
+      # Screen utilities - always needed
+      grim                # Screenshot tool
+      slurp               # Region selection
+      swappy              # Screenshot editor
+      wl-clipboard        # Clipboard utilities
+      
+      # Brightness/audio controls - always needed
+      brightnessctl       # Brightness control
+      pamixer             # Audio control
+      playerctl           # Media player control
+    ] ++ (if useNoctalia then [
+      # Noctalia provides its own bar, notifications, launcher, wallpaper, and lock
+    ] else [
       # Launchers
       fuzzel              # Application launcher
       wofi                # Alternative launcher
@@ -64,12 +85,6 @@ in
       # Notifications
       mako                # Notification daemon
       libnotify           # notify-send command
-      
-      # Screen utilities
-      grim                # Screenshot tool
-      slurp               # Region selection
-      swappy              # Screenshot editor
-      wl-clipboard        # Clipboard utilities
       
       # Display/lock
       swaylock            # Screen locker
@@ -80,12 +95,7 @@ in
       
       # Wallpaper
       swaybg              # Wallpaper setter
-      
-      # Brightness/audio
-      brightnessctl       # Brightness control
-      pamixer             # Audio control
-      playerctl           # Media player control
-    ];
+    ]);
     
     # XDG portal for screen sharing, file dialogs
     xdg.portal = {
@@ -118,6 +128,8 @@ in
             }
         }
         
+        // Monitor configuration from modules.monitors
+        // Note: VRR is supported, HDR is NOT supported in Niri
         ${if monitorsCfg.displays != [] then monitorsCfg.niriConfig else ''output "eDP-1" {
             scale 1.0
         }''}
@@ -146,10 +158,16 @@ in
             }
         }
         
+        // Startup applications - conditional on Noctalia
+        ${if useNoctalia then ''
+        spawn-at-startup "noctalia-shell"
+        spawn-at-startup "${cfg.terminal}"
+        '' else ''
         spawn-at-startup "${cfg.terminal}"
         spawn-at-startup "waybar"
         spawn-at-startup "swaybg" "-i" "~/Pictures/wallpaper.png" "-m" "fill"
         spawn-at-startup "mako"
+        ''}
         
         prefer-no-csd
         
@@ -159,8 +177,13 @@ in
             // Terminal
             Mod+Return { spawn "${cfg.terminal}"; }
             
-            // Launcher
+            // Launcher - use Noctalia if enabled, otherwise fuzzel
+            ${if useNoctalia then ''
+            Mod+Space { spawn ${noctaliaBind "launcher toggle"}; }
+            Mod+D { spawn ${noctaliaBind "launcher toggle"}; }
+            '' else ''
             Mod+D { spawn "${cfg.launcher}"; }
+            ''}
             
             // Close window
             Mod+Q { close-window; }
@@ -242,27 +265,45 @@ in
             Mod+Print { screenshot-screen; }
             Mod+Shift+Print { screenshot-window; }
             
-            // Volume control
+            // Volume control - use Noctalia OSD if enabled
+            ${if useNoctalia then ''
+            XF86AudioRaiseVolume { spawn ${noctaliaBind "volume increase"}; }
+            XF86AudioLowerVolume { spawn ${noctaliaBind "volume decrease"}; }
+            XF86AudioMute { spawn ${noctaliaBind "volume muteOutput"}; }
+            '' else ''
             XF86AudioRaiseVolume { spawn "pamixer" "-i" "5"; }
             XF86AudioLowerVolume { spawn "pamixer" "-d" "5"; }
             XF86AudioMute { spawn "pamixer" "-t"; }
+            ''}
             
-            // Brightness control
+            // Brightness control - use Noctalia OSD if enabled
+            ${if useNoctalia then ''
+            XF86MonBrightnessUp { spawn ${noctaliaBind "brightness increase"}; }
+            XF86MonBrightnessDown { spawn ${noctaliaBind "brightness decrease"}; }
+            '' else ''
             XF86MonBrightnessUp { spawn "brightnessctl" "set" "+5%"; }
             XF86MonBrightnessDown { spawn "brightnessctl" "set" "5%-"; }
+            ''}
             
             // Media control
             XF86AudioPlay { spawn "playerctl" "play-pause"; }
             XF86AudioNext { spawn "playerctl" "next"; }
             XF86AudioPrev { spawn "playerctl" "previous"; }
             
-            // Lock screen
+            // Lock screen / Session menu
+            ${if useNoctalia then ''
+            Mod+Escape { spawn ${noctaliaBind "sessionMenu toggle"}; }
+            Mod+Ctrl+L { spawn ${noctaliaBind "lockScreen toggle"}; }
+            Mod+A { spawn ${noctaliaBind "controlCenter toggle"}; }
+            '' else ''
             Mod+Escape { spawn "swaylock" "-f"; }
+            ''}
         }
       '';
       
-      # Waybar configuration for Niri
-      programs.waybar = {
+      # Waybar configuration for Niri - disabled when using Noctalia
+      # (Noctalia provides its own bar)
+      programs.waybar = mkIf (!useNoctalia) {
         enable = true;
         settings = [{
           layer = "top";
@@ -342,8 +383,9 @@ in
         '';
       };
       
-      # Mako notification daemon
-      services.mako = {
+      # Mako notification daemon - disabled when using Noctalia
+      # (Noctalia provides its own notification system)
+      services.mako = mkIf (!useNoctalia) {
         enable = true;
         defaultTimeout = 5000;
         borderRadius = 8;

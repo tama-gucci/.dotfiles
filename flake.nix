@@ -1,61 +1,72 @@
 {
-  # Human-readable description of what this flake provides
-  description = "NixOS System Configuration";
+  description = "NixOS System Configuration - Dendritic Pattern";
 
-  # INPUTS: External dependencies (like package.json dependencies)
+  # ═══════════════════════════════════════════════════════════════════════════
+  # INPUTS
+  # ═══════════════════════════════════════════════════════════════════════════
   inputs = {
+    # Core
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
-    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     
-    lanzaboote = {
-      url = "github:nix-community/lanzaboote/v0.4.3";
-      inputs.nixpkgs.follows = "nixpkgs";
+    # Flake infrastructure
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
     };
+    import-tree.url = "github:vic/import-tree";
+    
+    # Home manager
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    caelestia-shell = {
-      url = "github:caelestia-dots/shell";
+    
+    # Hardware support
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+    lanzaboote = {
+      url = "github:nix-community/lanzaboote/v0.4.3";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    
+    # Kernels and packages
+    chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
+    
+    # Desktop environment
+    noctalia = {
+      url = "github:noctalia-dev/noctalia-shell";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    
+    # Applications
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  # OUTPUTS: What this flake produces (the actual system configuration)
-  outputs = { nixpkgs, home-manager, chaotic, lanzaboote, ... }@inputs: 
-  let
-    # Helper function to create a NixOS system
-    mkSystem = { hostname, system ? "x86_64-linux" }:
-      nixpkgs.lib.nixosSystem {
-        inherit system;
-        specialArgs = { inherit inputs; };
-        modules = [
-          ./modules
-          home-manager.nixosModules.home-manager
-          chaotic.nixosModules.default
-          lanzaboote.nixosModules.lanzaboote 
-          ./hosts/${hostname}
-        ];
-      };
-  in
-  {
-    nixosConfigurations = {
-      obelisk = mkSystem { hostname = "obelisk"; };
+  # ═══════════════════════════════════════════════════════════════════════════
+  # OUTPUTS
+  # ═══════════════════════════════════════════════════════════════════════════
+  outputs = inputs:
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = [ "x86_64-linux" "aarch64-linux" ];
+      
+      # Automatically import all .nix files in modules.new/
+      # Each file is a flake-parts module
+      imports = inputs.import-tree.lib.importTree ./modules.new;
     };
-  };
 
-  # Binary caches - download pre-built packages instead of compiling locally
+  # ═══════════════════════════════════════════════════════════════════════════
+  # NIX CONFIGURATION
+  # ═══════════════════════════════════════════════════════════════════════════
   nixConfig = {
     extra-substituters = [
-      "https://nix-community.cachix.org"  # Community packages
+      "https://nix-community.cachix.org"
+      "https://chaotic-nyx.cachix.org"
     ];
     extra-trusted-public-keys = [
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "chaotic-nyx.cachix.org-1:HfnXSw4pj95iI/n17rIDy40agHj12WfF+Gqk6SonIT8="
     ];
   };
 }

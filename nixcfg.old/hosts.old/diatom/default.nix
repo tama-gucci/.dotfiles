@@ -42,9 +42,12 @@
       }
     ];
 
-    # Interface
-    hyprland = {
+    # Interface - Using Noctalia shell with Hyprland
+    noctalia = {
       enable = true;
+      windowManager = "hyprland";  # or "niri" to switch compositors
+      
+      # Shared settings (passed to selected WM)
       autoLogin = true;
       terminal = "kitty";
       fileManager = "nautilus";
@@ -53,10 +56,12 @@
         size = 24;
       };
       
-      caelestia = {
-        enable = true;
-        wallpaperDir = "~/Pictures/Wallpapers";
-        showBattery = false;
+      # Noctalia-specific settings
+      wallpaperDir = "~/Pictures/Wallpapers";
+      showBattery = true;  # Laptop - show battery
+      bar = {
+        position = "top";
+        density = "default";
       };
     };
 

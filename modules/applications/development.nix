@@ -1,164 +1,164 @@
-{ config, lib, pkgs, ... }:
-
-with lib;
-
+# ═══════════════════════════════════════════════════════════════════════════
+# DEVELOPMENT MODULE
+# ═══════════════════════════════════════════════════════════════════════════
+# Development tools, editors, and language support
+{ lib, config, inputs, pkgs, ... }:
 let
-  cfg = config.modules.development;
+  meta = config.flake.meta;
 in
 {
-  options.modules.development = {
-    enable = mkEnableOption "Development tools and environment";
-    
-    languages = {
-      python = mkEnableOption "Python development";
-      javascript = mkEnableOption "JavaScript/Node.js development";
-      rust = mkEnableOption "Rust development";
-      go = mkEnableOption "Go development";
-      c = mkEnableOption "C/C++ development";
-      nix = mkEnableOption "Nix development" // { default = true; };
-    };
-    
-    editors = {
-      vscode = mkEnableOption "Visual Studio Code";
-      neovim = mkEnableOption "Neovim with development plugins" // { default = true; };
-      zed = mkEnableOption "Zed editor";
-    };
-    
-    containers = mkEnableOption "Docker and container tools";
-    
-    databases = mkEnableOption "Database clients and tools";
-  };
-
-  config = mkIf cfg.enable {
-    # Ensure git module is enabled for development
-    modules.git.enable = true;
-    
-    # Core development tools (always included)
-    environment.systemPackages = with pkgs;
-      [
-        # Build essentials
-        gnumake
-        cmake
-        pkg-config
-        
-        # Terminal utilities
-        ripgrep               # Fast grep (rg)
-        fd                    # Fast find
-        fzf                   # Fuzzy finder
-        jq                    # JSON processor
-        yq                    # YAML processor
-        tree                  # Directory listing
-        httpie                # Modern HTTP client
-        
-        # File management
-        zip
-        p7zip
-        
-        # Process management
-        btop
-        
-        # Networking
-        nmap
-        dig
-      ]
-      
-      # Nix development
-      ++ optionals cfg.languages.nix [
-        nil                   # Nix LSP
-        nixfmt-rfc-style      # Nix formatter
-        nix-tree              # Dependency viewer
-        nix-diff              # Compare derivations
-        statix                # Nix linter
-        deadnix               # Dead code finder
-      ]
-      
-      # Python
-      ++ optionals cfg.languages.python [
-        python3
-        python3Packages.pip
-        python3Packages.virtualenv
-        python3Packages.ipython
-        ruff                  # Fast Python linter/formatter
-        pyright               # Python LSP
-      ]
-      
-      # JavaScript/Node.js
-      ++ optionals cfg.languages.javascript [
-        nodejs
-        nodePackages.npm
-        nodePackages.pnpm
-        nodePackages.yarn
-        nodePackages.typescript
-        nodePackages.typescript-language-server
-        deno
-        bun
-      ]
-      
-      # Rust
-      ++ optionals cfg.languages.rust [
-        rustup                # Rust toolchain manager
-        rust-analyzer         # Rust LSP
-        cargo-watch           # Auto-rebuild on changes
-        cargo-edit            # Cargo add/rm/upgrade
-      ]
-      
-      # Go
-      ++ optionals cfg.languages.go [
-        go
-        gopls                 # Go LSP
-        golangci-lint         # Go linter
-        delve                 # Go debugger
-      ]
-      
-      # C/C++
-      ++ optionals cfg.languages.c [
-        gcc
-        clang
-        clang-tools           # clangd, clang-format
-        gdb
-        lldb
-        valgrind
-      ]
-      
+  # ─────────────────────────────────────────────────────────────────────────
+  # NAMED MODULE EXPORT
+  # ─────────────────────────────────────────────────────────────────────────
+  flake.modules.nixos.development = { config, pkgs, ... }: {
+    # Essential development packages
+    environment.systemPackages = with pkgs; [
       # Editors
-      ++ optionals cfg.editors.vscode [
-        vscode
-      ]
+      neovim
+      helix
       
-      ++ optionals cfg.editors.neovim [
-        neovim
-        tree-sitter           # Parser for syntax highlighting
-      ]
+      # Version control
+      git
+      gh
+      lazygit
       
-      ++ optionals cfg.editors.zed [
-        zed-editor
-      ]
+      # Build tools
+      gnumake
+      cmake
+      meson
+      ninja
+      
+      # Languages & runtimes
+      rustup
+      go
+      nodejs
+      python3
+      
+      # Language servers
+      nil # Nix
+      rust-analyzer
+      gopls
+      nodePackages.typescript-language-server
+      pyright
       
       # Containers
-      ++ optionals cfg.containers [
-        docker-compose
-        lazydocker            # Terminal UI for Docker
-        dive                  # Explore Docker images
-        podman
-        podman-compose
-      ]
+      podman
+      distrobox
       
-      # Databases
-      ++ optionals cfg.databases [
-        dbeaver-bin           # Universal database GUI
-        postgresql            # PostgreSQL client (psql)
-        sqlite
-        redis
-      ];
-    
-    # Docker daemon (if containers enabled)
-    virtualisation.docker = mkIf cfg.containers {
-      enable = true;
-      enableOnBoot = false;   # Start on-demand to save resources
+      # Utilities
+      jq
+      yq
+      ripgrep
+      fd
+      bat
+      eza
+      fzf
+      zoxide
+      direnv
+      
+      # Nix tools
+      alejandra
+      nixd
+      nix-tree
+      nix-diff
+    ];
+
+    # Enable Docker/Podman
+    virtualisation = {
+      podman = {
+        enable = true;
+        dockerCompat = true;
+        defaultNetwork.settings.dns_enabled = true;
+      };
     };
-    
-    # Add user to docker group
-    users.users.${config.modules.user.name}.extraGroups = 
-      mkIf cfg.containers [ "docker" ];
+
+    # Direnv for automatic environment switching
+    programs.direnv = {
+      enable = true;
+      nix-direnv.enable = true;
+    };
+
+    # User development setup via home-manager
+    home-manager.users.${meta.owner.username} = { pkgs, ... }: {
+      # Neovim as default editor
+      home.sessionVariables = {
+        EDITOR = meta.defaults.editor;
+        VISUAL = meta.defaults.editor;
+      };
+
+      # Git configuration
+      programs.git = {
+        enable = true;
+        userName = meta.owner.name;
+        userEmail = meta.owner.email;
+        
+        extraConfig = {
+          init.defaultBranch = "main";
+          pull.rebase = true;
+          push.autoSetupRemote = true;
+          
+          diff.algorithm = "histogram";
+          merge.conflictstyle = "zdiff3";
+          
+          rerere.enabled = true;
+          column.ui = "auto";
+          branch.sort = "-committerdate";
+        };
+        
+        delta = {
+          enable = true;
+          options = {
+            navigate = true;
+            side-by-side = true;
+            line-numbers = true;
+          };
+        };
+      };
+
+      # Lazygit config
+      programs.lazygit = {
+        enable = true;
+        settings = {
+          gui = {
+            showRandomTip = false;
+            nerdFontsVersion = "3";
+          };
+        };
+      };
+
+      # Zoxide for smart cd
+      programs.zoxide = {
+        enable = true;
+        enableFishIntegration = true;
+      };
+
+      # Bat for syntax-highlighted cat
+      programs.bat = {
+        enable = true;
+        config = {
+          theme = "Catppuccin Mocha";
+        };
+      };
+
+      # Fzf for fuzzy finding
+      programs.fzf = {
+        enable = true;
+        enableFishIntegration = true;
+        colors = {
+          bg = "#1e1e2e";
+          "bg+" = "#313244";
+          fg = "#cdd6f4";
+          "fg+" = "#cdd6f4";
+          hl = "#f38ba8";
+          "hl+" = "#f38ba8";
+          header = "#f38ba8";
+          info = "#cba6f7";
+          marker = "#f5e0dc";
+          pointer = "#f5e0dc";
+          prompt = "#cba6f7";
+          spinner = "#f5e0dc";
+        };
+      };
+    };
   };
 }

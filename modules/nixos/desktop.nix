@@ -1,35 +1,23 @@
 # ═══════════════════════════════════════════════════════════════════════════
-# SECURE BOOT (LANZABOOTE)
+# NIXOS DESKTOP MODULE
 # ═══════════════════════════════════════════════════════════════════════════
-# Secure boot support using lanzaboote
-# Usage: Import flake.modules.nixos.secureboot in your configuration
-{ ... }:
+# Configuration specific to desktop computers
+# Inherits: pc
+# Differences from laptop: no battery, no power saving, more performance
+{ config, ... }:
 {
-  flake.modules.nixos.secureboot = { pkgs, lib, ... }: {
-    # ─────────────────────────────────────────────────────────────────────────
-    # OPTIONS
-    # ─────────────────────────────────────────────────────────────────────────
-    options.secureboot = {
-      pkiBundle = lib.mkOption {
-        type = lib.types.str;
-        default = "/var/lib/sbctl";
-        description = "Path to Secure Boot PKI bundle";
-      };
-    };
+  flake.modules.nixos.desktop = { lib, ... }: {
+    imports = [ config.flake.modules.nixos.pc ];
     
     # ─────────────────────────────────────────────────────────────────────────
-    # CONFIG
+    # POWER (desktop doesn't need power saving)
     # ─────────────────────────────────────────────────────────────────────────
-    config = {
-      # Disable systemd-boot (lanzaboote takes over)
-      boot.loader.systemd-boot.enable = lib.mkForce false;
-      
-      boot.lanzaboote = {
-        enable = true;
-        pkiBundle = "/var/lib/sbctl";
-      };
-      
-      environment.systemPackages = [ pkgs.sbctl ];
-    };
+    services.power-profiles-daemon.enable = lib.mkForce false;
+    
+    # ─────────────────────────────────────────────────────────────────────────
+    # PERFORMANCE
+    # ─────────────────────────────────────────────────────────────────────────
+    # Desktop can use more aggressive settings
+    powerManagement.cpuFreqGovernor = lib.mkDefault "performance";
   };
 }

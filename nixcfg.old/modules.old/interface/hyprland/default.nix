@@ -8,7 +8,8 @@ let
   monitorsCfg = config.modules.monitors;
 in
 {
-  imports = [ ./caelestia.nix ];
+  # Note: Noctalia shell integration is handled by the noctalia.nix module
+  # which injects keybinds and startup commands when enabled
 
   options.modules.hyprland = {
     enable = mkEnableOption "Hyprland window manager";
@@ -213,7 +214,7 @@ in
             # Applications
             "SUPER, Return, exec, ${cfg.terminal}"
             "SUPER, E, exec, ${cfg.fileManager}"
-            "SUPER, Space, global, caelestia:launcher"
+            # Note: Launcher (SUPER+Space) is configured by the shell module (e.g., Noctalia)
             
             # Focus navigation
             "SUPER, left, movefocus, l"
