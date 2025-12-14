@@ -51,6 +51,13 @@ in
         # Bus IDs: run `lspci | grep VGA` to verify
         nvidia = {
           useCustomKernel = false;  # Use linux-surface kernel from Surface module
+          
+          # Fix for GPU locked at 10W power limit on Surface Laptop Studio
+          # This disables Runtime D3, restoring 35W of the 50W limit
+          # Trade-off: Higher idle power consumption (GPU cannot fully power down)
+          # See: https://github.com/linux-surface/linux-surface/wiki/Surface-Laptop-Studio
+          disableRuntimeD3 = true;
+          
           prime = {
             enable = true;
             mode = "offload";  # Best battery life; use "sync" for performance

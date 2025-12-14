@@ -19,6 +19,19 @@
         '';
       };
       
+      # Surface Laptop Studio specific workaround
+      # See: https://github.com/linux-surface/linux-surface/wiki/Surface-Laptop-Studio#nvidia-gpu-locked-at-10w-power-limit
+      disableRuntimeD3 = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = ''
+          Disable NVIDIA Runtime D3 power management.
+          Required for Surface Laptop Studio to avoid GPU being locked to 10W.
+          Note: This will increase power consumption as GPU cannot fully power down.
+          Restores 35W of the 50W limit (remaining 15W is Dynamic Boost).
+        '';
+      };
+      
       prime = {
         enable = lib.mkEnableOption "NVIDIA Optimus (hybrid graphics)";
         mode = lib.mkOption {
@@ -55,13 +68,24 @@
       # Preserve VRAM during suspend
       boot.kernelParams = [ "nvidia.NVreg_PreserveVideoMemoryAllocations=1" ];
       
+      # Disable Runtime D3 for Surface Laptop Studio GPU power limit fix
+      # This prevents the GPU from getting stuck at 10W after D3cold transitions
+      # See: https://github.com/linux-surface/linux-surface/wiki/Surface-Laptop-Studio
+      boot.extraModprobeConfig = lib.mkIf config.nvidia.disableRuntimeD3 ''
+        options nvidia "NVreg_DynamicPowerManagement=0x00"
+      '';
+      
       # X11/Wayland driver
       services.xserver.videoDrivers = [ "nvidia" ];
       
       hardware.nvidia = {
         modesetting.enable = true;
         powerManagement.enable = true;
-        powerManagement.finegrained = config.nvidia.prime.enable && config.nvidia.prime.mode == "offload";
+        # Finegrained PM uses Runtime D3 - disable if D3 is disabled
+        powerManagement.finegrained = 
+          config.nvidia.prime.enable 
+          && config.nvidia.prime.mode == "offload"
+          && !config.nvidia.disableRuntimeD3;
         open = false;
         nvidiaSettings = true;
         # Use beta drivers from whatever kernel is configured
