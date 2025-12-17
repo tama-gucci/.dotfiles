@@ -53,7 +53,7 @@
       
       # Automatically import all .nix files in modules.new/
       # Each file is a flake-parts module
-      imports = inputs.import-tree.lib.importTree ./modules.new;
+      imports = inputs.import-tree.lib.importTree ./modules;
     };
 
   # ═══════════════════════════════════════════════════════════════════════════
