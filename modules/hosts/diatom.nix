@@ -22,11 +22,11 @@ in
       modules.hibernation
       
       # Interface
-      modules.niri           # Window manager
+      modules.niri               # Window manager
       modules.noctalia           # Desktop shell
       
       # Applications
-      modules.gaming             # Steam, Lutris, etc.
+      modules.gaming             # Steam, Faugus, etc.
       modules.development        # Dev tools
       modules.zen-browser        # Browser
       
@@ -161,6 +161,7 @@ in
     ];
   };
 }
+
 
 
 
