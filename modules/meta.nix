@@ -34,7 +34,7 @@
       fileManager = "nautilus";
       
       # Locale
-      timezone = "America/New_York";
+      timezone = "America/Chicago";
       locale = "en_US.UTF-8";
       keyboardLayout = "us";
       
@@ -50,7 +50,8 @@
       };
       
       # NixOS state version
-      stateVersion = "24.11";
+      stateVersion = "25.11";
     };
   };
 }
+
