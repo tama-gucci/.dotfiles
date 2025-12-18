@@ -3,6 +3,8 @@
 # ═══════════════════════════════════════════════════════════════════════════
 # Universal monitor configuration that generates WM-specific configs
 { lib, ... }:
+{
+  flake.modules.nixos.nvidia = { pkgs, lib, config, ... }: {
 let
   # ─────────────────────────────────────────────────────────────────────────
   # MONITOR TYPE
@@ -150,4 +152,6 @@ in
          else if displays != [] then (lib.head displays).name
          else null;
   };
+ };
 }
+
