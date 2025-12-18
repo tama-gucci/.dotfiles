@@ -325,7 +325,23 @@ nvidia = {
 
 ## Part 6: Install NixOS
 
-### 6.1 Build and Install
+### 6.1 Create Secure Boot Keys
+
+This configuration uses Lanzaboote for Secure Boot. You must create the Secure Boot keys **before** running `nixos-install`:
+
+```bash
+# Install sbctl in a temporary shell
+nix-shell -p sbctl
+
+# Create Secure Boot keys in the target system's expected location
+# Note: Lanzaboote expects keys in /var/lib/sbctl/keys (the /keys subdirectory is required)
+sudo sbctl create-keys -e /mnt/var/lib/sbctl/keys --disable-landlock
+```
+
+> **Important:** Without this step, the installation will fail with:
+> `Failed to install generation 1: Get stub name: No such file or directory (os error 2)`
+
+### 6.2 Build and Install
 
 ```bash
 # From the dotfiles directory
@@ -337,14 +353,14 @@ This will:
 - Install to `/mnt`
 - Prompt you to set the root password
 
-### 6.2 Set User Password
+### 6.3 Set User Password
 
 ```bash
 # Set password for your user
 sudo nixos-enter --root /mnt -c 'passwd sin'
 ```
 
-### 6.3 Reboot
+### 6.4 Reboot
 
 ```bash
 sudo reboot
@@ -400,12 +416,9 @@ nvidia-smi -q | grep -A 3 "Power Readings"
 
 ### 7.5 Re-enable Secure Boot (Optional)
 
-This configuration includes lanzaboote for Secure Boot. To enable:
+This configuration includes lanzaboote for Secure Boot. The keys were created during installation (Part 6.1). To enable Secure Boot:
 
 ```bash
-# Generate Secure Boot keys
-sudo sbctl create-keys
-
 # Enroll keys in firmware (with Microsoft keys for dual-boot)
 sudo sbctl enroll-keys --microsoft
 
