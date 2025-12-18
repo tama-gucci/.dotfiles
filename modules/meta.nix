@@ -30,7 +30,7 @@
       
       # Editors
       editor = "nvim";
-      terminal = "kitty";
+      terminal = "ghostty";
       fileManager = "thunar";
       
       # Locale
@@ -54,5 +54,6 @@
     };
   };
 }
+
 
 
