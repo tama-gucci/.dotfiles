@@ -13,7 +13,7 @@ in
   flake.modules.nixos.zen-browser = { config, pkgs, ... }: {
     # Install Zen Browser from flake input
     environment.systemPackages = [
-      inputs.zen-browser.packages.${pkgs.system}.default
+      inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
     ];
 
     # Set as default browser
