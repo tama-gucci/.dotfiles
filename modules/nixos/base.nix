@@ -67,6 +67,7 @@ in
       wget
       vim
       git
+      yazi
     ];
     
     # ─────────────────────────────────────────────────────────────────────────
@@ -75,3 +76,4 @@ in
     system.stateVersion = lib.mkDefault meta.defaults.stateVersion;
   };
 }
+
