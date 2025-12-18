@@ -64,32 +64,18 @@
     };
     
     # ─────────────────────────────────────────────────────────────────────────
+    # IMPORTS
+    # ─────────────────────────────────────────────────────────────────────────
+    # Import nixos-hardware Surface modules
+    # Note: Common surface module provides patched kernel, firmware, etc.
+    imports = [ 
+      inputs.nixos-hardware.nixosModules.microsoft-surface-common 
+    ];
+    
+    # ─────────────────────────────────────────────────────────────────────────
     # CONFIG
     # ─────────────────────────────────────────────────────────────────────────
     config = {
-      # Import nixos-hardware Surface modules based on model
-      imports = 
-        # Common Surface module (patched kernel, firmware, etc.)
-        [ inputs.nixos-hardware.nixosModules.microsoft-surface-common ]
-        
-        # Model-specific imports
-        ++ lib.optionals (cfg.model == "laptop-studio" || cfg.model == "laptop-studio-2") [
-          # Laptop Studio uses Intel CPU (handled by parent laptop module)
-          # NVIDIA GPU is handled by the nvidia module with Prime
-          inputs.nixos-hardware.nixosModules.common-pc
-          inputs.nixos-hardware.nixosModules.common-pc-ssd
-          inputs.nixos-hardware.nixosModules.common-cpu-intel
-        ]
-        ++ lib.optionals (cfg.model == "pro-intel") [
-          inputs.nixos-hardware.nixosModules.microsoft-surface-pro-intel
-        ]
-        ++ lib.optionals (cfg.model == "laptop-amd") [
-          inputs.nixos-hardware.nixosModules.microsoft-surface-laptop-amd
-        ]
-        ++ lib.optionals (cfg.model == "go") [
-          inputs.nixos-hardware.nixosModules.microsoft-surface-go
-        ];
-      
       # Set kernel version preference
       hardware.microsoft-surface.kernelVersion = cfg.kernelVersion;
       
@@ -117,10 +103,10 @@
       # ─────────────────────────────────────────────────────────────────────
       # Quirks for touchpad and tablet mode issues
       # See: https://github.com/linux-surface/linux-surface/wiki/Surface-Laptop-Studio
-      environment.etc."libinput/local-overrides.quirks".text = lib.mkMerge [
+      environment.etc."libinput/local-overrides.quirks".text = lib.concatStringsSep "\n" (lib.filter (x: x != "") [
         # Touchpad palm detection quirk for SLS1
         # Fixes: cursor not moving, cursor stops when selecting text/dragging
-        (lib.mkIf cfg.quirks.touchpadPalmDetection ''
+        (lib.optionalString cfg.quirks.touchpadPalmDetection ''
           [Microsoft Surface Laptop Studio Touchpad]
           MatchVendor=0x045E
           MatchProduct=0x09AF
@@ -131,13 +117,13 @@
         
         # Slate mode quirk - allows keyboard/touchpad to work in slate position
         # Fixes: keyboard/touchpad disabled when screen folded on Wayland
-        (lib.mkIf cfg.quirks.slateModePeripherals ''
+        (lib.optionalString cfg.quirks.slateModePeripherals ''
           [Microsoft Surface Laptop Studio Built-In Peripherals]
           MatchName=Microsoft Surface
           MatchDMIModalias=dmi:*svnMicrosoftCorporation:pnSurfaceLaptopStudio:*
           ModelTabletModeNoSuspend=1
         '')
-      ];
+      ]);
       
       # ─────────────────────────────────────────────────────────────────────
       # SURFACE CONTROL UTILITY

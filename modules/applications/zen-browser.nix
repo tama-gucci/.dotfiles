@@ -2,7 +2,7 @@
 # ZEN BROWSER MODULE
 # ═══════════════════════════════════════════════════════════════════════════
 # Zen Browser - privacy-focused Firefox fork
-{ lib, config, inputs, pkgs, ... }:
+{ config, inputs, ... }:
 let
   meta = config.flake.meta;
 in

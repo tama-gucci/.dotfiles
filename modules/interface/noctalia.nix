@@ -2,7 +2,7 @@
 # NOCTALIA SHELL MODULE
 # ═══════════════════════════════════════════════════════════════════════════
 # Window-manager agnostic shell with integration for Hyprland and Niri
-{ lib, config, inputs, pkgs, ... }:
+{ config, inputs, ... }:
 let
   meta = config.flake.meta;
 in

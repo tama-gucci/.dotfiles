@@ -50,7 +50,7 @@
       };
       
       # NixOS state version
-      stateVersion = "25.11";
+      stateVersion = "24.11";
     };
   };
 }

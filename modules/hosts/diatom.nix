@@ -2,7 +2,7 @@
 # HOST: DIATOM
 # ═══════════════════════════════════════════════════════════════════════════
 # Microsoft Surface Laptop Studio - Intel CPU, NVIDIA GPU (Optimus)
-{ lib, config, inputs, pkgs, modulesPath, ... }:
+{ config, ... }:
 let
   modules = config.flake.modules.nixos;
 in

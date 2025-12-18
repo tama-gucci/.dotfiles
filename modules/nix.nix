@@ -2,6 +2,8 @@
 # NIX SETTINGS
 # ═══════════════════════════════════════════════════════════════════════════
 # Nix daemon configuration applied to all systems
+# NOTE: NixOS nix settings are now in modules/nixos/base.nix
+# This file only provides home-manager base settings
 { lib, config, ... }:
 let
   # Shared Nix settings for all configuration types
@@ -19,25 +21,6 @@ let
 in
 {
   flake.modules = {
-    # ─────────────────────────────────────────────────────────────────────────
-    # NIXOS
-    # ─────────────────────────────────────────────────────────────────────────
-    nixos.base = {
-      nix = {
-        settings = nixSettings;
-        
-        # Garbage collection
-        gc = {
-          automatic = true;
-          dates = "weekly";
-          options = "--delete-older-than 30d";
-        };
-      };
-      
-      # Allow unfree packages
-      nixpkgs.config.allowUnfree = true;
-    };
-    
     # ─────────────────────────────────────────────────────────────────────────
     # HOME MANAGER
     # ─────────────────────────────────────────────────────────────────────────
