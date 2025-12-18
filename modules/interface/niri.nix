@@ -49,8 +49,6 @@ in
 
     # Home-manager Niri configuration
     home-manager.users.${meta.owner.username} = { pkgs, ... }: {
-      imports = [ inputs.niri.homeModules.niri ];
-
       programs.niri = {
         settings = {
           # Input configuration
@@ -99,7 +97,7 @@ in
 
           # Spawn at startup
           spawn-at-startup = [
-            { command = [ "swww-daemon" ]; }
+            { argv = [ "swww-daemon" ]; }
           ];
 
           # Keybindings
@@ -110,21 +108,21 @@ in
             "${mod}+D".action.spawn = [ "fuzzel" ];
             "${mod}+E".action.spawn = [ meta.defaults.fileManager ];
             
-            "${mod}+Q".action = "close-window";
-            "${mod}+Shift+E".action = "quit";
-            "${mod}+Shift+Slash".action = "show-hotkey-overlay";
+            "${mod}+Q".action.close-window = {};
+            "${mod}+Shift+E".action.quit = {};
+            "${mod}+Shift+Slash".action.show-hotkey-overlay = {};
             
             # Focus
-            "${mod}+H".action = "focus-column-left";
-            "${mod}+J".action = "focus-window-down";
-            "${mod}+K".action = "focus-window-up";
-            "${mod}+L".action = "focus-column-right";
+            "${mod}+H".action.focus-column-left = {};
+            "${mod}+J".action.focus-window-down = {};
+            "${mod}+K".action.focus-window-up = {};
+            "${mod}+L".action.focus-column-right = {};
             
             # Move
-            "${mod}+Shift+H".action = "move-column-left";
-            "${mod}+Shift+J".action = "move-window-down";
-            "${mod}+Shift+K".action = "move-window-up";
-            "${mod}+Shift+L".action = "move-column-right";
+            "${mod}+Shift+H".action.move-column-left = {};
+            "${mod}+Shift+J".action.move-window-down = {};
+            "${mod}+Shift+K".action.move-window-up = {};
+            "${mod}+Shift+L".action.move-column-right = {};
             
             # Workspace
             "${mod}+1".action.focus-workspace = 1;
@@ -149,16 +147,16 @@ in
             "${mod}+Shift+9".action.move-column-to-workspace = 9;
             
             # Layout
-            "${mod}+F".action = "maximize-column";
-            "${mod}+Shift+F".action = "fullscreen-window";
-            "${mod}+V".action = "toggle-window-floating";
+            "${mod}+F".action.maximize-column = {};
+            "${mod}+Shift+F".action.fullscreen-window = {};
+            "${mod}+V".action.toggle-window-floating = {};
             "${mod}+Minus".action.set-column-width = "-10%";
             "${mod}+Equal".action.set-column-width = "+10%";
             
             # Screenshot
-            "Print".action = "screenshot";
-            "Shift+Print".action = "screenshot-screen";
-            "${mod}+Print".action = "screenshot-window";
+            "Print".action.screenshot = {};
+            "Shift+Print".action.screenshot-screen = {};
+            "${mod}+Print".action.screenshot-window = {};
           };
         };
       };
