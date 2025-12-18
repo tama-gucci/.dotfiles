@@ -26,11 +26,11 @@
     services.logind = {
       lidSwitch = "suspend-then-hibernate";
       lidSwitchExternalPower = "suspend";
-      extraConfig = ''
-        HandlePowerKey=suspend-then-hibernate
-        IdleAction=suspend-then-hibernate
-        IdleActionSec=15min
-      '';
+      powerKey = "suspend-then-hibernate";
+      settings.Login = {
+        IdleAction = "suspend-then-hibernate";
+        IdleActionSec = "15min";
+      };
     };
     
     systemd.sleep.extraConfig = ''
