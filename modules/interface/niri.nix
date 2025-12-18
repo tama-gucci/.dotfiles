@@ -15,6 +15,11 @@ in
 
     programs.niri = {
       enable = true;
+      # Disable tests to avoid "Too many open files" error during Nix build
+      # See: https://github.com/sodiboo/niri-flake (niri tests can fail in sandboxed builds)
+      package = inputs.niri.packages.${pkgs.stdenv.hostPlatform.system}.niri-stable.overrideAttrs (_: {
+        doCheck = false;
+      });
     };
 
     # XDG Desktop Portal
