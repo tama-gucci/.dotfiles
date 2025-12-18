@@ -1,7 +1,7 @@
 # ═══════════════════════════════════════════════════════════════════════════
 # GAMING MODULE
 # ═══════════════════════════════════════════════════════════════════════════
-# Steam, Lutris, and gaming optimizations
+# Steam and gaming optimizations
 { config, ... }:
 let
   meta = config.flake.meta;
@@ -35,7 +35,7 @@ in
 
     # Gamescope compositor
     programs.gamescope = {
-      enable = true;
+      enable = false;
       capSysNice = true;
     };
 
@@ -46,8 +46,6 @@ in
     environment.systemPackages = with pkgs; [
       # Launchers
       faugus-launcher
-      heroic
-      bottles
       
       # Proton/Wine
       protonup-qt
@@ -84,3 +82,4 @@ in
     };
   };
 }
+
