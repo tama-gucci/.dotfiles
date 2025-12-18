@@ -49,8 +49,6 @@ in
 
     # Home-manager Niri configuration
     home-manager.users.${meta.owner.username} = { pkgs, ... }: {
-      imports = [ inputs.niri.homeModules.niri ];
-
       programs.niri = {
         settings = {
           # Input configuration
