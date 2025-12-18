@@ -80,6 +80,22 @@
       hardware.microsoft-surface.kernelVersion = cfg.kernelVersion;
       
       # ─────────────────────────────────────────────────────────────────────
+      # KERNEL RUST SUPPORT
+      # ─────────────────────────────────────────────────────────────────────
+      # Disable Rust support in kernel to fix build error with Linux 6.15.x
+      # Error: target-pointer-width expects u16 but gets string "64"
+      # This is a known compatibility issue between kernel Rust target spec and rustc
+      boot.kernelPatches = [
+        {
+          name = "disable-rust";
+          patch = null;
+          extraStructuredConfig = with lib.kernel; {
+            RUST = lib.mkForce no;
+          };
+        }
+      ];
+      
+      # ─────────────────────────────────────────────────────────────────────
       # TOUCHSCREEN & STYLUS (IPTSD)
       # ─────────────────────────────────────────────────────────────────────
       # IPTSD = Intel Precise Touch & Stylus Daemon
