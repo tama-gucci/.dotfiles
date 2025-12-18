@@ -19,6 +19,7 @@ in
       modules.nvidia             # NVIDIA drivers (with Optimus support)
       modules.surface            # Surface hardware (patched kernel, iptsd, etc.)
       modules.secureboot         # Lanzaboote
+      modules.hibernation
       
       # Interface
       modules.hyprland           # Window manager
@@ -128,3 +129,4 @@ in
     ];
   };
 }
+
