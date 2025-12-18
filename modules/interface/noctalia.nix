@@ -11,7 +11,7 @@ in
   # NAMED MODULE EXPORT
   # ─────────────────────────────────────────────────────────────────────────
   flake.modules.nixos.noctalia = { config, pkgs, ... }: {
-    imports = [ inputs.noctalia.nixosModules.noctalia ];
+    imports = [ inputs.noctalia.nixosModules.default ];
 
     # Enable Noctalia shell
     programs.noctalia = {
@@ -72,3 +72,4 @@ in
     };
   };
 }
+
