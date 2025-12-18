@@ -13,39 +13,9 @@ in
   flake.modules.nixos.noctalia = { config, pkgs, ... }: {
     imports = [ inputs.noctalia.nixosModules.default ];
 
-    # Enable Noctalia shell
-    programs.noctalia = {
+    # Enable Noctalia shell systemd service
+    services.noctalia-shell = {
       enable = true;
-      
-      # Bar (Ags-based)
-      bar.enable = true;
-      
-      # Notifications (Ags-based)
-      notifications.enable = true;
-      
-      # Application launcher
-      launcher.enable = true;
-      
-      # OSD (On-Screen Display)
-      osd.enable = true;
-      
-      # Power menu / session controls
-      session.enable = true;
-      
-      # Screenshot utility
-      screenshot.enable = true;
-      
-      # Clipboard manager
-      clipboard.enable = true;
-      
-      # Wallpaper manager (swww-based)
-      wallpaper.enable = true;
-      
-      # Lock screen
-      lockscreen.enable = true;
-      
-      # Idle management
-      idle.enable = true;
     };
 
     # Additional packages that complement Noctalia
@@ -58,15 +28,45 @@ in
 
     # Home-manager integration for user-level Noctalia config
     home-manager.users.${meta.owner.username} = { pkgs, ... }: {
-      # Noctalia stores user configuration in XDG config
-      xdg.configFile = {
-        # Theme configuration (can be extended)
-        "noctalia/theme.json".text = builtins.toJSON {
-          accent = "#89b4fa";
-          background = "#1e1e2e";
-          foreground = "#cdd6f4";
-          border-radius = 12;
-          gaps = 10;
+      imports = [ inputs.noctalia.homeModules.default ];
+
+      # Enable Noctalia shell user configuration
+      programs.noctalia-shell = {
+        enable = true;
+
+        # Shell settings
+        settings = {
+          bar = {
+            position = "top";
+            floating = true;
+            backgroundOpacity = 0.95;
+          };
+          general = {
+            animationSpeed = 1.5;
+            radiusRatio = 1.2;
+          };
+          colorSchemes = {
+            darkMode = true;
+            useWallpaperColors = true;
+          };
+        };
+
+        # Color configuration (Catppuccin Mocha inspired)
+        colors = {
+          mPrimary = "#89b4fa";
+          mSecondary = "#cba6f7";
+          mTertiary = "#f5c2e7";
+          mSurface = "#1e1e2e";
+          mSurfaceVariant = "#313244";
+          mOnSurface = "#cdd6f4";
+          mOnSurfaceVariant = "#a6adc8";
+          mOutline = "#45475a";
+          mShadow = "#000000";
+          mError = "#f38ba8";
+          mOnError = "#1e1e2e";
+          mOnPrimary = "#1e1e2e";
+          mOnSecondary = "#1e1e2e";
+          mOnTertiary = "#1e1e2e";
         };
       };
     };
