@@ -31,7 +31,7 @@
       # Editors
       editor = "nvim";
       terminal = "kitty";
-      fileManager = "nautilus";
+      fileManager = "thunar";
       
       # Locale
       timezone = "America/Chicago";
@@ -54,4 +54,5 @@
     };
   };
 }
+
 
