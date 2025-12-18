@@ -148,8 +148,8 @@ in
             "${mod}+F".action = "maximize-column";
             "${mod}+Shift+F".action = "fullscreen-window";
             "${mod}+V".action = "toggle-window-floating";
-            "${mod}+Minus".action = "set-column-width" "-10%";
-            "${mod}+Equal".action = "set-column-width" "+10%";
+            "${mod}+Minus".action.set-column-width = "-10%";
+            "${mod}+Equal".action.set-column-width = "+10%";
             
             # Screenshot
             "Print".action = "screenshot";
