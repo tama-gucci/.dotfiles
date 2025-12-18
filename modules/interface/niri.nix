@@ -2,9 +2,7 @@
 # NIRI WINDOW MANAGER MODULE
 # ═══════════════════════════════════════════════════════════════════════════
 # Niri scrolling compositor with NVIDIA support and modern Wayland features
-# NOTE: This module requires niri to be available in nixpkgs. For the full
-# home-manager integration, consider adding the niri flake as an input.
-{ lib, config, ... }:
+{ config, ... }:
 let
   meta = config.flake.meta;
 in
@@ -13,16 +11,9 @@ in
   # NAMED MODULE EXPORT
   # ─────────────────────────────────────────────────────────────────────────
   flake.modules.nixos.niri = { config, pkgs, lib, ... }: {
-    # Install niri as a package (programs.niri is not a NixOS option)
-    environment.systemPackages = with pkgs; [
-      niri
-      wl-clipboard
-      cliphist
-      swww
-      fuzzel
-      grim
-      slurp
-    ];
+    programs.niri = {
+      enable = true;
+    };
 
     # XDG Desktop Portal
     xdg.portal = {
@@ -44,113 +35,129 @@ in
       XCURSOR_SIZE = toString meta.defaults.cursor.size;
     };
 
-    # Home-manager Niri configuration (using xdg.configFile instead of programs.niri)
+    # Essential utilities
+    environment.systemPackages = with pkgs; [
+      wl-clipboard
+      cliphist
+      swww
+      fuzzel
+      grim
+      slurp
+    ];
+
+    # Home-manager Niri configuration
     home-manager.users.${meta.owner.username} = { pkgs, ... }: {
-      # Write niri config file directly
-      xdg.configFile."niri/config.kdl".text = ''
-        // Input configuration
-        input {
-            keyboard {
-                xkb {
-                    layout "us"
-                }
-            }
-            touchpad {
-                tap
-                natural-scroll
-            }
-            mouse {
-                accel-profile "flat"
-            }
-        }
+      programs.niri = {
+        settings = {
+          # Input configuration
+          input = {
+            keyboard = {
+              xkb = {
+                layout = "us";
+              };
+            };
+            touchpad = {
+              tap = true;
+              natural-scroll = true;
+            };
+            mouse = {
+              accel-profile = "flat";
+            };
+          };
 
-        // Layout
-        layout {
-            gaps 10
-            center-focused-column "never"
-            
-            preset-column-widths {
-                proportion 0.33333
-                proportion 0.5
-                proportion 0.66667
-            }
-            
-            default-column-width { proportion 0.5; }
-            
-            focus-ring {
-                width 2
-            }
-        }
+          # Layout
+          layout = {
+            gaps = 10;
+            center-focused-column = "never";
+            preset-column-widths = [
+              { proportion = 1.0 / 3.0; }
+              { proportion = 1.0 / 2.0; }
+              { proportion = 2.0 / 3.0; }
+            ];
+            default-column-width = { proportion = 1.0 / 2.0; };
+            focus-ring = {
+              enable = true;
+              width = 2;
+            };
+            border = {
+              enable = false;
+            };
+          };
 
-        // Animations
-        animations {
-        }
+          # Animations
+          animations = {
+            enable = true;
+          };
 
-        // Misc
-        prefer-no-csd
+          # Misc
+          prefer-no-csd = true;
+          screenshot-path = "~/Pictures/Screenshots/%Y-%m-%d_%H-%M-%S.png";
 
-        screenshot-path "~/Pictures/Screenshots/%Y-%m-%d_%H-%M-%S.png"
+          # Spawn at startup
+          spawn-at-startup = [
+            { command = [ "swww-daemon" ]; }
+          ];
 
-        // Spawn at startup
-        spawn-at-startup "swww-daemon"
-
-        // Keybindings
-        binds {
-            Mod+Return { spawn "${meta.defaults.terminal}"; }
-            Mod+D { spawn "fuzzel"; }
-            Mod+E { spawn "${meta.defaults.fileManager}"; }
+          # Keybindings
+          binds = let
+            mod = "Mod";
+          in {
+            "${mod}+Return".action.spawn = [ meta.defaults.terminal ];
+            "${mod}+D".action.spawn = [ "fuzzel" ];
+            "${mod}+E".action.spawn = [ meta.defaults.fileManager ];
             
-            Mod+Q { close-window; }
-            Mod+Shift+E { quit; }
-            Mod+Shift+Slash { show-hotkey-overlay; }
+            "${mod}+Q".action = "close-window";
+            "${mod}+Shift+E".action = "quit";
+            "${mod}+Shift+Slash".action = "show-hotkey-overlay";
             
-            // Focus
-            Mod+H { focus-column-left; }
-            Mod+J { focus-window-down; }
-            Mod+K { focus-window-up; }
-            Mod+L { focus-column-right; }
+            # Focus
+            "${mod}+H".action = "focus-column-left";
+            "${mod}+J".action = "focus-window-down";
+            "${mod}+K".action = "focus-window-up";
+            "${mod}+L".action = "focus-column-right";
             
-            // Move
-            Mod+Shift+H { move-column-left; }
-            Mod+Shift+J { move-window-down; }
-            Mod+Shift+K { move-window-up; }
-            Mod+Shift+L { move-column-right; }
+            # Move
+            "${mod}+Shift+H".action = "move-column-left";
+            "${mod}+Shift+J".action = "move-window-down";
+            "${mod}+Shift+K".action = "move-window-up";
+            "${mod}+Shift+L".action = "move-column-right";
             
-            // Workspace
-            Mod+1 { focus-workspace 1; }
-            Mod+2 { focus-workspace 2; }
-            Mod+3 { focus-workspace 3; }
-            Mod+4 { focus-workspace 4; }
-            Mod+5 { focus-workspace 5; }
-            Mod+6 { focus-workspace 6; }
-            Mod+7 { focus-workspace 7; }
-            Mod+8 { focus-workspace 8; }
-            Mod+9 { focus-workspace 9; }
+            # Workspace
+            "${mod}+1".action.focus-workspace = 1;
+            "${mod}+2".action.focus-workspace = 2;
+            "${mod}+3".action.focus-workspace = 3;
+            "${mod}+4".action.focus-workspace = 4;
+            "${mod}+5".action.focus-workspace = 5;
+            "${mod}+6".action.focus-workspace = 6;
+            "${mod}+7".action.focus-workspace = 7;
+            "${mod}+8".action.focus-workspace = 8;
+            "${mod}+9".action.focus-workspace = 9;
             
-            // Move to workspace
-            Mod+Shift+1 { move-column-to-workspace 1; }
-            Mod+Shift+2 { move-column-to-workspace 2; }
-            Mod+Shift+3 { move-column-to-workspace 3; }
-            Mod+Shift+4 { move-column-to-workspace 4; }
-            Mod+Shift+5 { move-column-to-workspace 5; }
-            Mod+Shift+6 { move-column-to-workspace 6; }
-            Mod+Shift+7 { move-column-to-workspace 7; }
-            Mod+Shift+8 { move-column-to-workspace 8; }
-            Mod+Shift+9 { move-column-to-workspace 9; }
+            # Move to workspace
+            "${mod}+Shift+1".action.move-column-to-workspace = 1;
+            "${mod}+Shift+2".action.move-column-to-workspace = 2;
+            "${mod}+Shift+3".action.move-column-to-workspace = 3;
+            "${mod}+Shift+4".action.move-column-to-workspace = 4;
+            "${mod}+Shift+5".action.move-column-to-workspace = 5;
+            "${mod}+Shift+6".action.move-column-to-workspace = 6;
+            "${mod}+Shift+7".action.move-column-to-workspace = 7;
+            "${mod}+Shift+8".action.move-column-to-workspace = 8;
+            "${mod}+Shift+9".action.move-column-to-workspace = 9;
             
-            // Layout
-            Mod+F { maximize-column; }
-            Mod+Shift+F { fullscreen-window; }
-            Mod+V { toggle-window-floating; }
-            Mod+Minus { set-column-width "-10%"; }
-            Mod+Equal { set-column-width "+10%"; }
+            # Layout
+            "${mod}+F".action = "maximize-column";
+            "${mod}+Shift+F".action = "fullscreen-window";
+            "${mod}+V".action = "toggle-window-floating";
+            "${mod}+Minus".action = "set-column-width" "-10%";
+            "${mod}+Equal".action = "set-column-width" "+10%";
             
-            // Screenshot
-            Print { screenshot; }
-            Shift+Print { screenshot-screen; }
-            Mod+Print { screenshot-window; }
-        }
-      '';
+            # Screenshot
+            "Print".action = "screenshot";
+            "Shift+Print".action = "screenshot-screen";
+            "${mod}+Print".action = "screenshot-window";
+          };
+        };
+      };
     };
   };
 }
