@@ -93,23 +93,55 @@ in
         boot.kernelModules = [ "kvm-intel" ];
         
         # ─────────────────────────────────────────────────────────────────
-        # PLACEHOLDER: FILESYSTEMS
+        # FILESYSTEMS
         # ─────────────────────────────────────────────────────────────────
-        # TODO: Run nixos-generate-config and update these UUIDs
-        # boot.initrd.luks.devices."encrypted".device = 
-        #   "/dev/disk/by-uuid/YOUR-LUKS-UUID";
-        
-        # fileSystems."/" = {
-        #   device = "/dev/disk/by-uuid/YOUR-ROOT-UUID";
-        #   fsType = "btrfs";
-        #   options = [ "subvol=root" "compress=zstd" "noatime" ];
-        # };
-        
-        # fileSystems."/boot" = {
-        #   device = "/dev/disk/by-uuid/YOUR-BOOT-UUID";
-        #   fsType = "vfat";
-        # };
-        
+        # LUKS device
+        boot.initrd.luks.devices."encrypted".device = 
+          "/dev/disk/by-uuid/d72eaf4b-0f3d-400e-9c2c-309845cd7475";
+
+        # Root filesystem
+        fileSystems."/" = {
+          device = "/dev/disk/by-uuid/47352277-92e3-49cb-9a5e-551a6850c619";
+          fsType = "btrfs";
+          options = [ "subvol=root" "compress=zstd" "noatime" "ssd" "discard=async" ];
+        };
+
+        fileSystems."/home" = {
+          device = "/dev/disk/by-uuid/47352277-92e3-49cb-9a5e-551a6850c619";
+          fsType = "btrfs";
+          options = [ "subvol=home" "compress=zstd" "noatime" "ssd" "discard=async" ];
+        };
+
+        fileSystems."/nix" = {
+          device = "/dev/disk/by-uuid/47352277-92e3-49cb-9a5e-551a6850c619";
+          fsType = "btrfs";
+          options = [ "subvol=nix" "compress=zstd" "noatime" "ssd" "discard=async" ];
+        };
+
+        fileSystems."/persist" = {
+          device = "/dev/disk/by-uuid/47352277-92e3-49cb-9a5e-551a6850c619";
+          fsType = "btrfs";
+          options = [ "subvol=persist" "compress=zstd" "noatime" "ssd" "discard=async" ];
+        };
+
+        fileSystems."/var/log" = {
+          device = "/dev/disk/by-uuid/47352277-92e3-49cb-9a5e-551a6850c619";
+          fsType = "btrfs";
+          options = [ "subvol=log" "compress=zstd" "noatime" "ssd" "discard=async" ];
+          neededForBoot = true;
+        };
+
+        fileSystems."/swap" = {
+          device = "/dev/disk/by-uuid/47352277-92e3-49cb-9a5e-551a6850c619";
+          fsType = "btrfs";
+          options = [ "subvol=swap" "noatime" ];
+        };
+
+        fileSystems."/boot" = {
+          device = "/dev/disk/by-uuid/A9C0-146A";
+          fsType = "vfat";
+        };      
+
         # ─────────────────────────────────────────────────────────────────
         # HARDWARE
         # ─────────────────────────────────────────────────────────────────
@@ -129,4 +161,5 @@ in
     ];
   };
 }
+
 
