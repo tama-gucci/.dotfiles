@@ -161,6 +161,12 @@ in
         
         # Btop
         programs.btop.enable = true;
+
+        # KDE Connect
+        programs.kdeconnect = {
+          enable = true;
+          indicator = true;
+        };
       };
     };
     
@@ -180,3 +186,4 @@ in
     programs.dconf.enable = true;
   };
 }
+
