@@ -24,10 +24,10 @@
     # SUSPEND/HIBERNATE
     # ─────────────────────────────────────────────────────────────────────────
     services.logind = {
-      lidSwitch = "suspend-then-hibernate";
-      lidSwitchExternalPower = "suspend";
-      powerKey = "suspend-then-hibernate";
       settings.Login = {
+        HandleLidSwitch = "suspend-then-hibernate";
+        HandleLidSwitchExternalPower = "suspend";
+        HandlePowerKey = "suspend-then-hibernate";
         IdleAction = "suspend-then-hibernate";
         IdleActionSec = "15min";
       };
