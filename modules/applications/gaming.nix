@@ -2,7 +2,7 @@
 # GAMING MODULE
 # ═══════════════════════════════════════════════════════════════════════════
 # Steam, Lutris, and gaming optimizations
-{ lib, config, inputs, pkgs, ... }:
+{ config, ... }:
 let
   meta = config.flake.meta;
 in

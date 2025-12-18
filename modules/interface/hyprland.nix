@@ -2,16 +2,15 @@
 # HYPRLAND WINDOW MANAGER MODULE
 # ═══════════════════════════════════════════════════════════════════════════
 # Hyprland compositor with NVIDIA optimizations and Noctalia shell integration
-{ lib, config, pkgs, monitorLib ? {}, ... }:
+{ config, ... }:
 let
   meta = config.flake.meta;
-  inherit (config) monitors;
 in
 {
   # ─────────────────────────────────────────────────────────────────────────
   # NAMED MODULE EXPORT
   # ─────────────────────────────────────────────────────────────────────────
-  flake.modules.nixos.hyprland = { config, pkgs, ... }: {
+  flake.modules.nixos.hyprland = { config, pkgs, lib, ... }: {
     programs.hyprland = {
       enable = true;
       xwayland.enable = true;

@@ -5,7 +5,7 @@
 # Usage: Import flake.modules.nixos.secureboot in your configuration
 { ... }:
 {
-  flake.modules.nixos.secureboot = { pkgs, lib, ... }: {
+  flake.modules.nixos.secureboot = { pkgs, lib, config, ... }: {
     # ─────────────────────────────────────────────────────────────────────────
     # OPTIONS
     # ─────────────────────────────────────────────────────────────────────────
@@ -26,7 +26,7 @@
       
       boot.lanzaboote = {
         enable = true;
-        pkiBundle = "/var/lib/sbctl";
+        pkiBundle = config.secureboot.pkiBundle;
       };
       
       environment.systemPackages = [ pkgs.sbctl ];

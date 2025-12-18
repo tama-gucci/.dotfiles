@@ -2,7 +2,7 @@
 # DEVELOPMENT MODULE
 # ═══════════════════════════════════════════════════════════════════════════
 # Development tools, editors, and language support
-{ lib, config, inputs, pkgs, ... }:
+{ config, ... }:
 let
   meta = config.flake.meta;
 in

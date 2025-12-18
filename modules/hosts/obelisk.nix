@@ -2,7 +2,7 @@
 # HOST: OBELISK
 # ═══════════════════════════════════════════════════════════════════════════
 # Desktop PC - Intel CPU, NVIDIA GPU
-{ lib, config, inputs, pkgs, modulesPath, ... }:
+{ config, ... }:
 let
   modules = config.flake.modules.nixos;
 in
