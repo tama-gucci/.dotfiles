@@ -22,7 +22,7 @@ in
       modules.hibernation
       
       # Interface
-      modules.hyprland           # Window manager
+      modules.niri           # Window manager
       modules.noctalia           # Desktop shell
       
       # Applications
@@ -73,7 +73,7 @@ in
         hibernation = {
           enable = true;
           device = "/dev/nvme0n1p2";  # Adjust based on actual disk
-          offset = "533760";          # From: sudo filefrag -v /swap/swapfile
+          offset = "269568";          # From: sudo filefrag -v /swap/swapfile
           swapSize = "32G";
         };
         
@@ -161,5 +161,6 @@ in
     ];
   };
 }
+
 
 
