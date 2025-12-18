@@ -50,10 +50,7 @@
   outputs = inputs:
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [ "x86_64-linux" "aarch64-linux" ];
-      
-      # Automatically import all .nix files in modules.new/
-      # Each file is a flake-parts module
-      imports = inputs.import-tree.lib.importTree ./modules;
+      imports = [ (inputs.import-tree ./modules) ];
     };
 
   # ═══════════════════════════════════════════════════════════════════════════
@@ -70,3 +67,4 @@
     ];
   };
 }
+
