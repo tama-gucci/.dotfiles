@@ -3,6 +3,8 @@
 # ═══════════════════════════════════════════════════════════════════════════
 # Swapfile-based hibernation with proper resume configuration
 { lib, config, ... }:
+{
+  flake.modules.nixos.nvidia = { pkgs, lib, config, ... }: {
 let
   cfg = config.hibernation;
 in
@@ -46,4 +48,6 @@ in
       HibernateDelaySec=30m
     '';
   };
+ };
 }
+
