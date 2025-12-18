@@ -110,9 +110,9 @@ in
         # Git configuration
         programs.git = {
           enable = true;
-          userName = meta.owner.name;
-          userEmail = meta.owner.email;
-          extraConfig = {
+          settings = {
+            user.name = meta.owner.name;
+            user.email = meta.owner.email;
             init.defaultBranch = meta.defaults.git.defaultBranch;
             core.editor = meta.defaults.editor;
           };

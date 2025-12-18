@@ -89,10 +89,11 @@ in
       # Git configuration
       programs.git = {
         enable = true;
-        userName = meta.owner.name;
-        userEmail = meta.owner.email;
         
-        extraConfig = {
+        settings = {
+          user.name = meta.owner.name;
+          user.email = meta.owner.email;
+          
           init.defaultBranch = "main";
           pull.rebase = true;
           push.autoSetupRemote = true;
@@ -104,14 +105,16 @@ in
           column.ui = "auto";
           branch.sort = "-committerdate";
         };
-        
-        delta = {
-          enable = true;
-          options = {
-            navigate = true;
-            side-by-side = true;
-            line-numbers = true;
-          };
+      };
+
+      # Delta diff viewer
+      programs.delta = {
+        enable = true;
+        enableGitIntegration = true;
+        options = {
+          navigate = true;
+          side-by-side = true;
+          line-numbers = true;
         };
       };
 
