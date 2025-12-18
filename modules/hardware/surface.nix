@@ -89,7 +89,7 @@
         {
           name = "disable-rust";
           patch = null;
-          extraStructuredConfig = with lib.kernel; {
+          structuredExtraConfig = with lib.kernel; {
             RUST = lib.mkForce no;
           };
         }
@@ -203,3 +203,4 @@
     };
   };
 }
+
