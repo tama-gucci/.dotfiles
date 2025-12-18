@@ -2,7 +2,7 @@
 # NIRI WINDOW MANAGER MODULE
 # ═══════════════════════════════════════════════════════════════════════════
 # Niri scrolling compositor with NVIDIA support and modern Wayland features
-{ config, ... }:
+{ config, inputs, ... }:
 let
   meta = config.flake.meta;
 in
@@ -11,6 +11,8 @@ in
   # NAMED MODULE EXPORT
   # ─────────────────────────────────────────────────────────────────────────
   flake.modules.nixos.niri = { config, pkgs, lib, ... }: {
+    imports = [ inputs.niri.nixosModules.niri ];
+
     programs.niri = {
       enable = true;
     };
@@ -47,6 +49,8 @@ in
 
     # Home-manager Niri configuration
     home-manager.users.${meta.owner.username} = { pkgs, ... }: {
+      imports = [ inputs.niri.homeModules.niri ];
+
       programs.niri = {
         settings = {
           # Input configuration
