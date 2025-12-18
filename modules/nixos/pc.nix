@@ -163,8 +163,11 @@ in
         # Btop
         programs.btop.enable = true;
 
+        # Ghostty
+        programs.ghostty.enable = true;
+
         # KDE Connect
-        programs.kdeconnect = {
+        services.kdeconnect = {
           enable = true;
           indicator = true;
         };
@@ -187,5 +190,6 @@ in
     programs.dconf.enable = true;
   };
 }
+
 
 
