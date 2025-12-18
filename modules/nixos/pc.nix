@@ -80,6 +80,7 @@ in
       pamixer
       bibata-cursors
       wl-clipboard
+      xfce.thunar
     ];
     
     # ─────────────────────────────────────────────────────────────────────────
@@ -186,4 +187,5 @@ in
     programs.dconf.enable = true;
   };
 }
+
 
