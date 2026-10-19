@@ -11,18 +11,18 @@
   {
     options.hibernation = {
       enable = lib.mkEnableOption "swapfile-based hibernation";
-      
+
       device = lib.mkOption {
         type = lib.types.str;
         default = "/dev/nvme0n1p2";
         description = "Block device containing the swapfile";
       };
-      
+
       offset = lib.mkOption {
         type = lib.types.str;
         description = "Swap file offset (from `filefrag -v /swap/swapfile`)";
       };
-      
+
       swapSize = lib.mkOption {
         type = lib.types.str;
         default = "32G";
@@ -44,9 +44,7 @@
       };
 
       # Required for suspend-then-hibernate
-      systemd.sleep.extraConfig = ''
-        HibernateDelaySec=30m
-      '';
+      systemd.sleep.settings.Sleep.HibernateDelaySec = "30min";
     };
   };
 }
