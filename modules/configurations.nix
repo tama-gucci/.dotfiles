@@ -3,7 +3,12 @@
 # ═══════════════════════════════════════════════════════════════════════════
 # Defines the `configurations.nixos` option and evaluates them into
 # `flake.nixosConfigurations` outputs
-{ lib, config, inputs, ... }:
+{
+  lib,
+  config,
+  inputs,
+  ...
+}:
 {
   # ─────────────────────────────────────────────────────────────────────────
   # OPTIONS
@@ -19,13 +24,13 @@
           };
           modules = lib.mkOption {
             type = lib.types.listOf lib.types.deferredModule;
-            default = [];
+            default = [ ];
             description = "List of NixOS modules for this configuration";
           };
         };
       }
     );
-    default = {};
+    default = { };
     description = "NixOS configurations to build";
   };
 
@@ -35,25 +40,26 @@
   config.flake = {
     # Build nixosConfigurations from configurations.nixos
     nixosConfigurations = lib.mapAttrs (
-      name: { system, modules }:
+      name:
+      { system, modules }:
       lib.nixosSystem {
         inherit system;
         specialArgs = { inherit inputs; };
         modules = modules ++ [
           inputs.home-manager.nixosModules.home-manager
-          inputs.chaotic.nixosModules.default
-          inputs.lanzaboote.nixosModules.lanzaboote
         ];
       }
     ) config.configurations.nixos;
 
     # Add configurations as checks
     checks = lib.pipe config.flake.nixosConfigurations [
-      (lib.mapAttrsToList (name: nixos: {
-        ${nixos.config.nixpkgs.hostPlatform.system} = {
-          "nixos/${name}" = nixos.config.system.build.toplevel;
-        };
-      }))
+      (lib.mapAttrsToList (
+        name: nixos: {
+          ${nixos.config.nixpkgs.hostPlatform.system} = {
+            "nixos/${name}" = nixos.config.system.build.toplevel;
+          };
+        }
+      ))
       lib.mkMerge
     ];
   };

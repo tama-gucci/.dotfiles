@@ -8,18 +8,18 @@
 {
   flake.modules.nixos.laptop = { lib, ... }: {
     imports = [ config.flake.modules.nixos.pc ];
-    
+
     # ─────────────────────────────────────────────────────────────────────────
     # POWER MANAGEMENT
     # ─────────────────────────────────────────────────────────────────────────
     services.power-profiles-daemon.enable = true;
-    
+
     # Power-saving CPU governor
     powerManagement = {
       enable = true;
       cpuFreqGovernor = lib.mkDefault "powersave";
     };
-    
+
     # ─────────────────────────────────────────────────────────────────────────
     # SUSPEND/HIBERNATE
     # ─────────────────────────────────────────────────────────────────────────
@@ -32,15 +32,15 @@
         IdleActionSec = "15min";
       };
     };
-    
-    systemd.sleep.extraConfig = ''
-      AllowSuspend=yes
-      AllowHibernation=yes
-      AllowSuspendThenHibernate=yes
-      AllowHybridSleep=yes
-      HibernateDelaySec=30min
-    '';
-    
+
+    systemd.sleep.settings.Sleep = {
+      AllowSuspend = true;
+      AllowHibernation = true;
+      AllowSuspendThenHibernate = true;
+      AllowHybridSleep = true;
+      HibernateDelaySec = "30min";
+    };
+
     # ─────────────────────────────────────────────────────────────────────────
     # BATTERY
     # ─────────────────────────────────────────────────────────────────────────
